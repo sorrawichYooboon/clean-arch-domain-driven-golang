@@ -1,4 +1,4 @@
-module github.com/sorrawichYooboon/clean-arch-one-domain-golang
+module github.com/sorrawichYooboon/clean-arch-golang
 
 go 1.23.1
 
