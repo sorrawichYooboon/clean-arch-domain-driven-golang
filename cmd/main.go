@@ -1,32 +1,37 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/config"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/delivery/http"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/delivery/routes"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
 )
 
-type User struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found")
+	}
 }
 
 func main() {
 	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	db, redisClient := config.Initialize()
 
-	e.POST("/users", func(c echo.Context) error {
-		user := new(User)
+	bookRepo := repository.NewBookRepository(db)
+	cacheBookRepo := repository.NewCacheBookRepository(redisClient)
 
-		if err := c.Bind(user); err != nil {
-			return c.String(http.StatusBadRequest, "Invalid input")
-		}
+	bookUseCase := usecase.NewBookUseCase(bookRepo, cacheBookRepo)
 
-		return c.JSON(http.StatusOK, user)
-	})
+	bookHandler := http.NewBookHandler(bookUseCase)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	routes.SetupRoutes(e, bookHandler)
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
