@@ -62,7 +62,7 @@ go mod tidy
 Run the following command to start the server:
 
 ```bash
-go run ./cmd/main.go
+go run main.go
 ```
 
 The server will start on port <b>8080</b> by default. You can change the port in the main.go file if needed.
