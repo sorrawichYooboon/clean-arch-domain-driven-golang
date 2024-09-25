@@ -19,6 +19,14 @@ func NewAuthorHandler(uc *usecase.AuthorUseCase) *AuthorHandler {
 	}
 }
 
+// GetAll godoc
+// @Summary Get all authors
+// @Description Get all authors from the database
+// @Tags authors
+// @Produce json
+// @Success 200 {array} domain.Author
+// @Failure 500 {object} map[string]string
+// @Router /authors [get]
 func (h *AuthorHandler) GetAll(c echo.Context) error {
 	authors, err := h.UseCase.GetAllAuthors()
 	if err != nil {
@@ -28,6 +36,16 @@ func (h *AuthorHandler) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, authors)
 }
 
+// Create godoc
+// @Summary Create a new author
+// @Description Create a new author in the database
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param author body domain.Author true "Author data"
+// @Success 200 {object} domain.Author
+// @Failure 500 {object} map[string]string
+// @Router /authors [post]
 func (h *AuthorHandler) Create(c echo.Context) error {
 	author := new(domain.Author)
 	if err := c.Bind(author); err != nil {
@@ -42,6 +60,18 @@ func (h *AuthorHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusOK, author)
 }
 
+// Update godoc
+// @Summary Update an existing author
+// @Description Update the author with the given ID
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param id path int true "Author ID"
+// @Param author body domain.Author true "Author data"
+// @Success 200 {object} domain.Author
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /authors/{id} [put]
 func (h *AuthorHandler) Update(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	author, err := h.UseCase.GetAuthorByID(uint(id))
@@ -57,6 +87,14 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 	return c.JSON(http.StatusOK, author)
 }
 
+// Delete godoc
+// @Summary Delete an author
+// @Description Delete the author with the given ID
+// @Tags authors
+// @Param id path int true "Author ID"
+// @Success 204
+// @Failure 500 {object} map[string]string
+// @Router /authors/{id} [delete]
 func (h *AuthorHandler) Delete(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.UseCase.DeleteAuthor(uint(id)); err != nil {

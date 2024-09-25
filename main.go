@@ -6,10 +6,12 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/config"
+	_ "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/docs"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/delivery/http"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/delivery/routes"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func init() {
@@ -36,6 +38,8 @@ func main() {
 
 	routes.SetupBookRoutes(e, bookHandler)
 	routes.SetupAuthorRoutes(e, authorHandler)
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
