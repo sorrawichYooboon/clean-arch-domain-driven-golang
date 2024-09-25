@@ -26,12 +26,16 @@ func main() {
 
 	bookRepo := repository.NewBookRepository(db)
 	cacheBookRepo := repository.NewCacheBookRepository(redisClient)
-
 	bookUseCase := usecase.NewBookUseCase(bookRepo, cacheBookRepo)
-
 	bookHandler := http.NewBookHandler(bookUseCase)
 
-	routes.SetupRoutes(e, bookHandler)
+	authorRepo := repository.NewAuthorRepository(db)
+	cacheAuthorRepo := repository.NewCacheAuthorRepository(redisClient)
+	authorUseCase := usecase.NewAuthorUseCase(authorRepo, cacheAuthorRepo)
+	authorHandler := http.NewAuthorHandler(authorUseCase)
+
+	routes.SetupBookRoutes(e, bookHandler)
+	routes.SetupAuthorRoutes(e, authorHandler)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
