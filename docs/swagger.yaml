@@ -21,8 +21,69 @@ definitions:
       title:
         type: string
     type: object
+  dto.AuthorCreateDTO:
+    properties:
+      bio:
+        type: string
+      name:
+        type: string
+    required:
+    - bio
+    - name
+    type: object
+  dto.BookCreateDTO:
+    properties:
+      author:
+        type: string
+      category:
+        type: string
+      published_year:
+        type: integer
+      title:
+        type: string
+    required:
+    - author
+    - category
+    - published_year
+    - title
+    type: object
+  dto.Credentials:
+    description: User login credentials that include username and password.
+    properties:
+      password:
+        example: password123
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
+  dto.Error:
+    description: Standard error response
+    properties:
+      message:
+        example: An error occurred
+        type: string
+    type: object
+  dto.Response:
+    description: Standard response structure for API responses.
+    properties:
+      message:
+        example: User created successfully
+        type: string
+    type: object
+  dto.TokenResponse:
+    description: JWT token response after successful login.
+    properties:
+      token:
+        example: your_jwt_token_here
+        type: string
+    type: object
 info:
   contact: {}
+  description: This API enables management of a book store, allowing users to perform
+    operations such as adding, updating, retrieving, and deleting books.
+  title: Book Store Management API
+  version: "1.0"
 paths:
   /authors:
     get:
@@ -42,6 +103,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all authors
       tags:
       - authors
@@ -55,20 +118,24 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/domain.Author'
+          $ref: '#/definitions/dto.AuthorCreateDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Author'
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create a new author
       tags:
       - authors
@@ -84,12 +151,18 @@ paths:
       responses:
         "204":
           description: No Content
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete an author
       tags:
       - authors
@@ -108,7 +181,7 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/domain.Author'
+          $ref: '#/definitions/dto.AuthorCreateDTO'
       produces:
       - application/json
       responses:
@@ -128,6 +201,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update an existing author
       tags:
       - authors
@@ -149,6 +224,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all books
       tags:
       - books
@@ -162,20 +239,24 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/domain.Book'
+          $ref: '#/definitions/dto.BookCreateDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Book'
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Create a new book
       tags:
       - books
@@ -191,12 +272,18 @@ paths:
       responses:
         "204":
           description: No Content
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete a book
       tags:
       - books
@@ -215,7 +302,7 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/domain.Book'
+          $ref: '#/definitions/dto.BookCreateDTO'
       produces:
       - application/json
       responses:
@@ -235,7 +322,68 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update an existing book
       tags:
       - books
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login user and return JWT token
+      parameters:
+      - description: User login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT token
+          schema:
+            $ref: '#/definitions/dto.TokenResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Error'
+      summary: Login user
+      tags:
+      - users
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Credentials'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/dto.Error'
+      summary: Register a new user
+      tags:
+      - users
+securityDefinitions:
+  ApiKeyAuth:
+    description: 'You need to register and login on that api and Provide the JWT token
+      prefixed with "Bearer " (including a space). For example: "Bearer your_token_here"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

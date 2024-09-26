@@ -42,7 +42,8 @@ func (uc *BookUseCase) GetBookByID(id uint) (*domain.Book, error) {
 	return uc.Repo.GetByID(id)
 }
 
-func (uc *BookUseCase) CreateBook(book *domain.Book) error {
+func (uc *BookUseCase) CreateBook(title, author, category string, publishedYear int) error {
+	book := domain.NewBook(title, author, category, publishedYear)
 	err := uc.Repo.Create(book)
 	if err != nil {
 		return err

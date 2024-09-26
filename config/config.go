@@ -10,7 +10,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func Initialize() (*gorm.DB, *redis.Client) {
+type Config struct {
+	DB        *gorm.DB
+	Redis     *redis.Client
+	SecretKey string
+}
+
+func Initialize() *Config {
 	db, err := initializeDatabase()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
@@ -21,7 +27,13 @@ func Initialize() (*gorm.DB, *redis.Client) {
 		log.Fatalf("Failed to initialize Redis: %v", err)
 	}
 
-	return db, redisClient
+	secretKey := getEnv("SECRET_KEY", "default_secret_key")
+
+	return &Config{
+		DB:        db,
+		Redis:     redisClient,
+		SecretKey: secretKey,
+	}
 }
 
 func initializeDatabase() (*gorm.DB, error) {
@@ -43,7 +55,7 @@ func initializeDatabase() (*gorm.DB, error) {
 
 func initializeRedis() (*redis.Client, error) {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: getEnv("REDIS_ADDR", "localhost:6379"),
 	})
 
 	ctx := context.Background()

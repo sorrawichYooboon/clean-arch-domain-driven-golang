@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
 )
 
@@ -24,6 +25,7 @@ func NewAuthorHandler(uc *usecase.AuthorUseCase) *AuthorHandler {
 // @Description Get all authors from the database
 // @Tags authors
 // @Produce json
+// @Security ApiKeyAuth
 // @Success 200 {array} domain.Author
 // @Failure 500 {object} map[string]string
 // @Router /authors [get]
@@ -42,22 +44,23 @@ func (h *AuthorHandler) GetAll(c echo.Context) error {
 // @Tags authors
 // @Accept json
 // @Produce json
-// @Param author body domain.Author true "Author data"
-// @Success 200 {object} domain.Author
+// @Security ApiKeyAuth
+// @Param author body dto.AuthorCreateDTO true "Author data"
+// @Success 200 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /authors [post]
 func (h *AuthorHandler) Create(c echo.Context) error {
-	author := new(domain.Author)
-	if err := c.Bind(author); err != nil {
+	authorDTO := new(dto.AuthorCreateDTO)
+	if err := c.Bind(&authorDTO); err != nil {
 		return err
 	}
 
-	err := h.UseCase.CreateAuthor(author)
+	err := h.UseCase.CreateAuthor(authorDTO.Name, authorDTO.Bio)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, author)
+	return c.JSON(http.StatusOK, map[string]string{"status": "create author successfully"})
 }
 
 // Update godoc
@@ -66,8 +69,9 @@ func (h *AuthorHandler) Create(c echo.Context) error {
 // @Tags authors
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param id path int true "Author ID"
-// @Param author body domain.Author true "Author data"
+// @Param author body dto.AuthorCreateDTO true "Author data"
 // @Success 200 {object} domain.Author
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
@@ -79,8 +83,15 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Author not found"})
 	}
 
-	if err := c.Bind(&author); err != nil {
+	authorDTO := new(dto.AuthorCreateDTO)
+	if err := c.Bind(&authorDTO); err != nil {
 		return err
+	}
+
+	author = &domain.Author{
+		ID:   author.ID,
+		Name: authorDTO.Name,
+		Bio:  authorDTO.Bio,
 	}
 
 	h.UseCase.UpdateAuthor(author)
@@ -91,8 +102,9 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 // @Summary Delete an author
 // @Description Delete the author with the given ID
 // @Tags authors
+// @Security ApiKeyAuth
 // @Param id path int true "Author ID"
-// @Success 204
+// @Success 204 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /authors/{id} [delete]
 func (h *AuthorHandler) Delete(c echo.Context) error {
@@ -101,5 +113,5 @@ func (h *AuthorHandler) Delete(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusOK, map[string]string{"status": "delete author successfully"})
 }

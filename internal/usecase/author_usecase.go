@@ -42,7 +42,8 @@ func (uc *AuthorUseCase) GetAuthorByID(id uint) (*domain.Author, error) {
 	return uc.Repo.GetByID(id)
 }
 
-func (uc *AuthorUseCase) CreateAuthor(author *domain.Author) error {
+func (uc *AuthorUseCase) CreateAuthor(name, bio string) error {
+	author := domain.NewAuthor(name, bio)
 	err := uc.Repo.Create(author)
 	if err != nil {
 		return err
