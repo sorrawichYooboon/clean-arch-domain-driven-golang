@@ -67,7 +67,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AuthorCreateDTO"
+                            "$ref": "#/definitions/dto.AuthorDTO"
                         }
                     }
                 ],
@@ -125,7 +125,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AuthorCreateDTO"
+                            "$ref": "#/definitions/dto.AuthorDTO"
                         }
                     }
                 ],
@@ -258,7 +258,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BookCreateDTO"
+                            "$ref": "#/definitions/dto.BookDTO"
                         }
                     }
                 ],
@@ -316,7 +316,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BookCreateDTO"
+                            "$ref": "#/definitions/dto.BookDTO"
                         }
                     }
                 ],
@@ -409,7 +409,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Credentials"
+                            "$ref": "#/definitions/dto.CredentialsDTO"
                         }
                     }
                 ],
@@ -417,13 +417,13 @@
                     "200": {
                         "description": "JWT token",
                         "schema": {
-                            "$ref": "#/definitions/dto.TokenResponse"
+                            "$ref": "#/definitions/dto.TokenResponseDTO"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dto.Error"
+                            "$ref": "#/definitions/dto.ErrorDTO"
                         }
                     }
                 }
@@ -449,7 +449,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Credentials"
+                            "$ref": "#/definitions/dto.CredentialsDTO"
                         }
                     }
                 ],
@@ -457,13 +457,13 @@
                     "201": {
                         "description": "User registered successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/dto.Error"
+                            "$ref": "#/definitions/dto.ErrorDTO"
                         }
                     }
                 }
@@ -505,7 +505,7 @@
                 }
             }
         },
-        "dto.AuthorCreateDTO": {
+        "dto.AuthorDTO": {
             "type": "object",
             "required": [
                 "bio",
@@ -520,7 +520,7 @@
                 }
             }
         },
-        "dto.BookCreateDTO": {
+        "dto.BookDTO": {
             "type": "object",
             "required": [
                 "author",
@@ -543,7 +543,7 @@
                 }
             }
         },
-        "dto.Credentials": {
+        "dto.CredentialsDTO": {
             "description": "User login credentials that include username and password.",
             "type": "object",
             "properties": {
@@ -557,7 +557,7 @@
                 }
             }
         },
-        "dto.Error": {
+        "dto.ErrorDTO": {
             "description": "Standard error response",
             "type": "object",
             "properties": {
@@ -567,7 +567,7 @@
                 }
             }
         },
-        "dto.Response": {
+        "dto.ResponseDTO": {
             "description": "Standard response structure for API responses.",
             "type": "object",
             "properties": {
@@ -577,7 +577,7 @@
                 }
             }
         },
-        "dto.TokenResponse": {
+        "dto.TokenResponseDTO": {
             "description": "JWT token response after successful login.",
             "type": "object",
             "properties": {

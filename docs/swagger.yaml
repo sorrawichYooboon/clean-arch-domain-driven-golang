@@ -21,7 +21,7 @@ definitions:
       title:
         type: string
     type: object
-  dto.AuthorCreateDTO:
+  dto.AuthorDTO:
     properties:
       bio:
         type: string
@@ -31,7 +31,7 @@ definitions:
     - bio
     - name
     type: object
-  dto.BookCreateDTO:
+  dto.BookDTO:
     properties:
       author:
         type: string
@@ -47,7 +47,7 @@ definitions:
     - published_year
     - title
     type: object
-  dto.Credentials:
+  dto.CredentialsDTO:
     description: User login credentials that include username and password.
     properties:
       password:
@@ -57,21 +57,21 @@ definitions:
         example: john_doe
         type: string
     type: object
-  dto.Error:
+  dto.ErrorDTO:
     description: Standard error response
     properties:
       message:
         example: An error occurred
         type: string
     type: object
-  dto.Response:
+  dto.ResponseDTO:
     description: Standard response structure for API responses.
     properties:
       message:
         example: User created successfully
         type: string
     type: object
-  dto.TokenResponse:
+  dto.TokenResponseDTO:
     description: JWT token response after successful login.
     properties:
       token:
@@ -118,7 +118,7 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/dto.AuthorCreateDTO'
+          $ref: '#/definitions/dto.AuthorDTO'
       produces:
       - application/json
       responses:
@@ -181,7 +181,7 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/dto.AuthorCreateDTO'
+          $ref: '#/definitions/dto.AuthorDTO'
       produces:
       - application/json
       responses:
@@ -239,7 +239,7 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/dto.BookCreateDTO'
+          $ref: '#/definitions/dto.BookDTO'
       produces:
       - application/json
       responses:
@@ -302,7 +302,7 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/dto.BookCreateDTO'
+          $ref: '#/definitions/dto.BookDTO'
       produces:
       - application/json
       responses:
@@ -338,18 +338,18 @@ paths:
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/dto.Credentials'
+          $ref: '#/definitions/dto.CredentialsDTO'
       produces:
       - application/json
       responses:
         "200":
           description: JWT token
           schema:
-            $ref: '#/definitions/dto.TokenResponse'
+            $ref: '#/definitions/dto.TokenResponseDTO'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/dto.Error'
+            $ref: '#/definitions/dto.ErrorDTO'
       summary: Login user
       tags:
       - users
@@ -364,18 +364,18 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/dto.Credentials'
+          $ref: '#/definitions/dto.CredentialsDTO'
       produces:
       - application/json
       responses:
         "201":
           description: User registered successfully
           schema:
-            $ref: '#/definitions/dto.Response'
+            $ref: '#/definitions/dto.ResponseDTO'
         "400":
           description: Invalid input
           schema:
-            $ref: '#/definitions/dto.Error'
+            $ref: '#/definitions/dto.ErrorDTO'
       summary: Register a new user
       tags:
       - users

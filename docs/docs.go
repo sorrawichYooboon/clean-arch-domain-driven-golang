@@ -75,7 +75,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AuthorCreateDTO"
+                            "$ref": "#/definitions/dto.AuthorDTO"
                         }
                     }
                 ],
@@ -133,7 +133,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.AuthorCreateDTO"
+                            "$ref": "#/definitions/dto.AuthorDTO"
                         }
                     }
                 ],
@@ -266,7 +266,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BookCreateDTO"
+                            "$ref": "#/definitions/dto.BookDTO"
                         }
                     }
                 ],
@@ -324,7 +324,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.BookCreateDTO"
+                            "$ref": "#/definitions/dto.BookDTO"
                         }
                     }
                 ],
@@ -417,7 +417,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Credentials"
+                            "$ref": "#/definitions/dto.CredentialsDTO"
                         }
                     }
                 ],
@@ -425,13 +425,13 @@ const docTemplate = `{
                     "200": {
                         "description": "JWT token",
                         "schema": {
-                            "$ref": "#/definitions/dto.TokenResponse"
+                            "$ref": "#/definitions/dto.TokenResponseDTO"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/dto.Error"
+                            "$ref": "#/definitions/dto.ErrorDTO"
                         }
                     }
                 }
@@ -457,7 +457,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Credentials"
+                            "$ref": "#/definitions/dto.CredentialsDTO"
                         }
                     }
                 ],
@@ -465,13 +465,13 @@ const docTemplate = `{
                     "201": {
                         "description": "User registered successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.Response"
+                            "$ref": "#/definitions/dto.ResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/dto.Error"
+                            "$ref": "#/definitions/dto.ErrorDTO"
                         }
                     }
                 }
@@ -513,7 +513,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.AuthorCreateDTO": {
+        "dto.AuthorDTO": {
             "type": "object",
             "required": [
                 "bio",
@@ -528,7 +528,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.BookCreateDTO": {
+        "dto.BookDTO": {
             "type": "object",
             "required": [
                 "author",
@@ -551,7 +551,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Credentials": {
+        "dto.CredentialsDTO": {
             "description": "User login credentials that include username and password.",
             "type": "object",
             "properties": {
@@ -565,7 +565,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Error": {
+        "dto.ErrorDTO": {
             "description": "Standard error response",
             "type": "object",
             "properties": {
@@ -575,7 +575,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.Response": {
+        "dto.ResponseDTO": {
             "description": "Standard response structure for API responses.",
             "type": "object",
             "properties": {
@@ -585,7 +585,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.TokenResponse": {
+        "dto.TokenResponseDTO": {
             "description": "JWT token response after successful login.",
             "type": "object",
             "properties": {

@@ -22,11 +22,11 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 │   │   ├── author.go                   # Author entity
 │   │   └── user.go                     # User entity
 │   ├── /dto                         # Data Transfer Objects (DTOs) for API requests/responses
-│   │   ├── author.go                   # Author DTO for transferring author data
-│   │   ├── book.go                     # Book DTO for transferring book data
-│   │   ├── credentials.go              # DTO for user credentials (login/register)
-│   │   ├── error.go                    # Error responses for API
-│   │   └── response.go                 # Generic response structure for API
+│   │   ├── author_dto.go                   # Author DTO for transferring author data
+│   │   ├── book_dto.go                     # Book DTO for transferring book data
+│   │   ├── credentials_dto.go              # DTO for user credentials (login/register)
+│   │   ├── error_dto.go                    # Error responses for API
+│   │   └── response_dto.go                 # Generic response structure for API
 │   ├── /usecase                     # Use case logic
 │   │   ├── /interface                  # Interfaces for use cases
 │   │   │   ├── author_usecase_interface.go   # Author use case interface

@@ -45,12 +45,12 @@ func (h *BookHandler) GetAll(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param book body dto.BookCreateDTO true "Book data"
+// @Param book body dto.BookDTO true "Book data"
 // @Success 200 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /books [post]
 func (h *BookHandler) Create(c echo.Context) error {
-	bookDTO := new(dto.BookCreateDTO)
+	bookDTO := new(dto.BookDTO)
 	if err := c.Bind(bookDTO); err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (h *BookHandler) Create(c echo.Context) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Book ID"
-// @Param book body dto.BookCreateDTO true "Book data"
+// @Param book body dto.BookDTO true "Book data"
 // @Success 200 {object} domain.Book
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
@@ -83,7 +83,7 @@ func (h *BookHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Book not found"})
 	}
 
-	bookDTO := new(dto.BookCreateDTO)
+	bookDTO := new(dto.BookDTO)
 	if err := c.Bind(&bookDTO); err != nil {
 		return err
 	}

@@ -26,12 +26,12 @@ func NewUserHandler(userUseCase *usecase.UserUseCase, secretKey string) *UserHan
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param user body dto.Credentials true "User information"
-// @Success 201 {object} dto.Response "User registered successfully"
-// @Failure 400 {object} dto.Error "Invalid input"
+// @Param user body dto.CredentialsDTO true "User information"
+// @Success 201 {object} dto.ResponseDTO "User registered successfully"
+// @Failure 400 {object} dto.ErrorDTO "Invalid input"
 // @Router /register [post]
 func (h *UserHandler) Register(c echo.Context) error {
-	var credentials dto.Credentials
+	var credentials dto.CredentialsDTO
 	if err := c.Bind(&credentials); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
 	}
@@ -40,7 +40,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to create user"})
 	}
 
-	return c.JSON(http.StatusCreated, dto.Response{Message: "User created successfully"})
+	return c.JSON(http.StatusCreated, dto.ResponseDTO{Message: "User created successfully"})
 }
 
 // Login godoc
@@ -49,12 +49,12 @@ func (h *UserHandler) Register(c echo.Context) error {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param credentials body dto.Credentials true "User login credentials"
-// @Success 200 {object} dto.TokenResponse "JWT token"
-// @Failure 401 {object} dto.Error "Unauthorized"
+// @Param credentials body dto.CredentialsDTO true "User login credentials"
+// @Success 200 {object} dto.TokenResponseDTO "JWT token"
+// @Failure 401 {object} dto.ErrorDTO "Unauthorized"
 // @Router /login [post]
 func (h *UserHandler) Login(c echo.Context) error {
-	var credentials dto.Credentials
+	var credentials dto.CredentialsDTO
 	if err := c.Bind(&credentials); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
 	}
@@ -76,5 +76,5 @@ func (h *UserHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to generate token"})
 	}
 
-	return c.JSON(http.StatusOK, dto.TokenResponse{Token: tokenString})
+	return c.JSON(http.StatusOK, dto.TokenResponseDTO{Token: tokenString})
 }

@@ -45,12 +45,12 @@ func (h *AuthorHandler) GetAll(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param author body dto.AuthorCreateDTO true "Author data"
+// @Param author body dto.AuthorDTO true "Author data"
 // @Success 200 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /authors [post]
 func (h *AuthorHandler) Create(c echo.Context) error {
-	authorDTO := new(dto.AuthorCreateDTO)
+	authorDTO := new(dto.AuthorDTO)
 	if err := c.Bind(&authorDTO); err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (h *AuthorHandler) Create(c echo.Context) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Author ID"
-// @Param author body dto.AuthorCreateDTO true "Author data"
+// @Param author body dto.AuthorDTO true "Author data"
 // @Success 200 {object} domain.Author
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
@@ -83,7 +83,7 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Author not found"})
 	}
 
-	authorDTO := new(dto.AuthorCreateDTO)
+	authorDTO := new(dto.AuthorDTO)
 	if err := c.Bind(&authorDTO); err != nil {
 		return err
 	}
