@@ -4,14 +4,16 @@ import (
 	"fmt"
 
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/cache"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 )
 
 type AuthorUseCase struct {
-	Repo      domain.AuthorRepository
-	CacheRepo domain.CacheAuthorRepository
+	Repo      repository.AuthorRepository
+	CacheRepo cache.CacheAuthorRepository
 }
 
-func NewAuthorUseCase(repo domain.AuthorRepository, cacheRepo domain.CacheAuthorRepository) *AuthorUseCase {
+func NewAuthorUseCase(repo repository.AuthorRepository, cacheRepo cache.CacheAuthorRepository) *AuthorUseCase {
 	return &AuthorUseCase{
 		Repo:      repo,
 		CacheRepo: cacheRepo,

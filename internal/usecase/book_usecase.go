@@ -4,14 +4,16 @@ import (
 	"fmt"
 
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/cache"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 )
 
 type BookUseCase struct {
-	Repo      domain.BookRepository
-	CacheRepo domain.CacheBookRepository
+	Repo      repository.BookRepository
+	CacheRepo cache.CacheBookRepository
 }
 
-func NewBookUseCase(repo domain.BookRepository, cacheRepo domain.CacheBookRepository) *BookUseCase {
+func NewBookUseCase(repo repository.BookRepository, cacheRepo cache.CacheBookRepository) *BookUseCase {
 	return &BookUseCase{
 		Repo:      repo,
 		CacheRepo: cacheRepo,

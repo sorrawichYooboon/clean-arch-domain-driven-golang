@@ -5,11 +5,12 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/config"
 	_ "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/docs"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/delivery/http"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/delivery/routes"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/cache"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/config"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/database"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/controller.go"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -25,19 +26,18 @@ func main() {
 	e := echo.New()
 
 	db, redisClient := config.Initialize()
+	bookRepo := database.NewBookRepository(db)
+	cacheBookRepo := cache.NewCacheBookRepository(redisClient)
+	bookUseCase := usecase.NewBookUseCase(bookRepo, *cacheBookRepo)
+	bookHandler := controller.NewBookHandler(bookUseCase)
 
-	bookRepo := repository.NewBookRepository(db)
-	cacheBookRepo := repository.NewCacheBookRepository(redisClient)
-	bookUseCase := usecase.NewBookUseCase(bookRepo, cacheBookRepo)
-	bookHandler := http.NewBookHandler(bookUseCase)
+	authorRepo := database.NewAuthorRepository(db)
+	cacheAuthorRepo := cache.NewCacheAuthorRepository(redisClient)
+	authorUseCase := usecase.NewAuthorUseCase(authorRepo, *cacheAuthorRepo)
+	authorHandler := controller.NewAuthorHandler(authorUseCase)
 
-	authorRepo := repository.NewAuthorRepository(db)
-	cacheAuthorRepo := repository.NewCacheAuthorRepository(redisClient)
-	authorUseCase := usecase.NewAuthorUseCase(authorRepo, cacheAuthorRepo)
-	authorHandler := http.NewAuthorHandler(authorUseCase)
-
-	routes.SetupBookRoutes(e, bookHandler)
-	routes.SetupAuthorRoutes(e, authorHandler)
+	http.SetupBookRoutes(e, bookHandler)
+	http.SetupAuthorRoutes(e, authorHandler)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
