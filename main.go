@@ -5,9 +5,9 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/config"
 	_ "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/docs"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/cache"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/config"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/database"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/controller.go"

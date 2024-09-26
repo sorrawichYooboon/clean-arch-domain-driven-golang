@@ -83,20 +83,26 @@ This will provide an interactive interface for testing the API endpoints.
 
 The project follows a modular structure adhering to Clean Architecture principles. Here’s a brief overview of the main directories:
 
-- <b>config/</b>: Configuration setup for database and Redis connections.
-- <b>internal/</b>: Contains the core application logic, including:
-  - <b>delivery/</b>: HTTP handlers and route setups.
-  - <b>repository/</b>: Database access and caching logic.
-  - <b>usecase/</b>: Business logic and application services.
-- <b>migrations/</b>: Contains SQL scripts for creating the required database tables, which are automatically executed by the PostgreSQL Docker container during initialization.
-- <b>docs/</b>: Generated Swagger documentation files.
+- **config/**: Contains the configuration setup for database and Redis connections. It manages environment variables and configuration logic to ensure the application can connect to necessary services seamlessly.
+
+- **internal/**: This directory contains the core application logic, structured as follows:
+  - **domain/**: Core domain entities, including definitions for the `Book` and `Author` entities.
+  - **usecase/**: This folder implements the use case logic for the application, encapsulating the business rules and application services related to books and authors.
+  - **repository/**: Defines repository interfaces that outline how data will be accessed. This layer abstracts the underlying data source, allowing for easy swapping between different implementations.
+  - **infrastructure/**: Contains adapters for various infrastructures:
+    - **database/**: Implements PostgreSQL-specific repository logic.
+    - **cache/**: Implements Redis caching for optimized data retrieval.
+    - **http/**: Manages HTTP routing and controllers, handling incoming requests and responses.
+- **migrations/**: Contains SQL scripts for creating the required database tables, which are automatically executed by the PostgreSQL Docker container during initialization. This ensures the database is set up correctly for application use.
+
+- **docs/**: Holds the generated Swagger documentation files, providing a user-friendly interface for exploring API endpoints and their functionalities.
 
 ### Key Features
 
-- <b>CRUD Operations</b>: Create, Read, Update, and Delete functionality for books and authors.
-- <b>Caching</b>: Uses Redis to cache book and author data for faster access.
-- <b>Swagger Integration</b>: Automatically generated API documentation for easy - exploration of endpoints.
-- <b>GORM</b>: Utilizes GORM for ORM functionality with PostgreSQL.
+- **CRUD Operations**: Create, Read, Update, and Delete functionality for books and authors.
+- **Caching**: Uses Redis to cache book and author data for faster access.
+- **Swagger Integration**: Automatically generated API documentation for easy - exploration of endpoints.
+- **GORM**: Utilizes GORM for ORM functionality with PostgreSQL.
 
 ## Conclusion
 
