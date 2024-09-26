@@ -8,6 +8,10 @@ This project is a RESTful API built using Golang, following the principles of Cl
 
 The project follows a modular structure adhering to Clean Architecture principles. Here’s a brief overview of the main directories:
 
+![Clean Architecture DDD](https://storage.googleapis.com/bitloops-github-assets/Documentation%20Images/clean-architecture-and-ddd.png)
+
+_Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-language/learning/software-architecture/clean-architecture)_
+
 ```
 /bookstore
 ├── /config                      # Configuration settings for the application
