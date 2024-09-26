@@ -83,6 +83,43 @@ This will provide an interactive interface for testing the API endpoints.
 
 The project follows a modular structure adhering to Clean Architecture principles. Here’s a brief overview of the main directories:
 
+```
+/bookstore
+├── /internal
+│   ├── /domain                      # Core domain entities
+│   │   ├── book.go                     # Book entity
+│   │   └── author.go                   # Author entity
+│   ├── /usecase                     # Use case logic
+│   │   ├── book_usecase.go             # Book-related use cases
+│   │   └── author_usecase.go           # Author-related use cases
+│   ├── /repository                  # Repository interfaces
+│   │   ├── book_repository.go          # Book repository interface
+│   │   └── author_repository.go        # Author repository interface
+│   ├── /infrastructure              # Infrastructure (adapters)
+│   │   ├── /database                   # Database (Postgres) implementation
+│   │   │   ├── book_repo.go                # Postgres book repository
+│   │   │   └── author_repo.go              # Postgres author repository
+│   │   ├── /cache                   # Redis cache implementations
+│   │   │   ├── cache_book_repository.go   # Redis book cache repository
+│   │   │   └── cache_author_repository.go # Redis author cache repository
+│   │   ├── /http                    # HTTP controllers
+│   │   │   ├── /controller             # HTTP controllers
+│   │   │   │   ├── book_handler.go         # Book HTTP handler
+│   │   │   │   └── author_handler.go       # Author HTTP handler
+│   │   │   └── router.go               # HTTP routing logic
+│   │   ├── /external                # External service integrations
+│   │   │   ├── /shopify                # Shopify integration
+│   │   │   │   ├── shopify_service.go      # Shopify service logic
+│   │   │   │   └── shopify_repository.go   # Shopify repository interface
+│   │   │   └── /firebase               # Firebase integration
+│   │   │       ├── firebase_service.go     # Firebase service logic
+│   │   │       └── firebase_repository.go  # Firebase repository interface
+│   │   └── /config                  # Config management
+│   │       └── config.go               # Environment variables or configuration logic
+└── go.mod                       # Go module file
+└── main.go                      # Entry point for the app
+```
+
 - **config/**: Contains the configuration setup for database and Redis connections. It manages environment variables and configuration logic to ensure the application can connect to necessary services seamlessly.
 
 - **internal/**: This directory contains the core application logic, structured as follows:
