@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/controller"
-	middleware "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/middlewware"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/middleware"
 )
 
 func SetupBookRoutes(e *echo.Echo, bookHandler *controller.BookHandler, secretKey string) {

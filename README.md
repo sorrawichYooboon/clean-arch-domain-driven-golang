@@ -19,25 +19,42 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 ├── /internal                    # Core application logic
 │   ├── /domain                      # Core domain entities
 │   │   ├── book.go                     # Book entity
-│   │   └── author.go                   # Author entity
+│   │   ├── author.go                   # Author entity
+│   │   └── user.go                     # User entity
+│   ├── /dto                         # Data Transfer Objects (DTOs) for API requests/responses
+│   │   ├── author.go                   # Author DTO for transferring author data
+│   │   ├── book.go                     # Book DTO for transferring book data
+│   │   ├── credentials.go              # DTO for user credentials (login/register)
+│   │   ├── error.go                    # Error responses for API
+│   │   └── response.go                 # Generic response structure for API
 │   ├── /usecase                     # Use case logic
+│   │   ├── /interface                  # Interfaces for use cases
+│   │   │   ├── author_usecase_interface.go   # Author use case interface
+│   │   │   ├── book_usecase_interface.go     # Book use case interface
+│   │   │   └── user_usecase_interface.go     # User use case interface
 │   │   ├── book_usecase.go             # Book-related use cases
-│   │   └── author_usecase.go           # Author-related use cases
+│   │   ├── author_usecase.go           # Author-related use cases
+│   │   └── user_usecase.go             # User-related use cases
 │   ├── /repository                  # Repository interfaces
 │   │   ├── book_repository.go          # Book repository interface
-│   │   └── author_repository.go        # Author repository interface
+│   │   ├── author_repository.go        # Author repository interface
+│   │   └── user_repository.go          # User repository interface
 │   ├── /infrastructure              # Infrastructure (adapters)
 │   │   ├── /database                   # Database (Postgres) implementation
 │   │   │   ├── book_repo.go                # Postgres book repository
-│   │   │   └── author_repo.go              # Postgres author repository
+│   │   │   ├── author_repo.go              # Postgres author repository
+│   │   │   └── user_repo.go                # Postgres user repository
 │   │   ├── /cache                   # Redis cache implementations
 │   │   │   ├── cache_book_repository.go   # Redis book cache repository
 │   │   │   └── cache_author_repository.go # Redis author cache repository
 │   │   ├── /http                    # HTTP controllers
 │   │   │   ├── /controller             # HTTP controllers
 │   │   │   │   ├── book_handler.go         # Book HTTP handler
-│   │   │   │   └── author_handler.go       # Author HTTP handler
+│   │   │   │   ├── author_handler.go       # Author HTTP handler
+│   │   │   │   └── user_handler.go         # User HTTP handler
 │   │   │   └── router.go               # HTTP routing logic
+│   │   ├── /middleware              # Middleware for handling requests (e.g., authentication, logging)
+│   │   │   └── auth_middleware.go      # Middleware for authentication
 │   │   ├── /external                # External service integrations
 │   │   │   ├── /shopify                # Shopify integration
 │   │   │   │   ├── shopify_service.go      # Shopify service logic
@@ -57,12 +74,15 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 
 - **internal/**: This directory contains the core application logic, structured as follows:
   - **domain/**: Core domain entities, including definitions for the `Book` and `Author` entities.
+  - **dto/**: Contains Data Transfer Objects (DTOs) for API requests and responses, including the author, book, user credentials, and error responses. This layer ensures data is transferred efficiently between the client and server.
   - **usecase/**: This folder implements the use case logic for the application, encapsulating the business rules and application services related to books and authors.
   - **repository/**: Defines repository interfaces that outline how data will be accessed. This layer abstracts the underlying data source, allowing for easy swapping between different implementations.
   - **infrastructure/**: Contains adapters for various infrastructures:
     - **database/**: Implements PostgreSQL-specific repository logic.
     - **cache/**: Implements Redis caching for optimized data retrieval.
     - **http/**: Manages HTTP routing and controllers, handling incoming requests and responses.
+    - **middleware/**: Implements middleware components, such as authentication middleware, for handling requests, enhancing the application’s security and logging capabilities.
+    - **external/**: Contains integrations with external services, such as Shopify and Firebase, including service logic and repository interfaces for these services.
 - **migrations/**: Contains SQL scripts for creating the required database tables, which are automatically executed by the PostgreSQL Docker container during initialization. This ensures the database is set up correctly for application use.
 
 - **docs/**: Holds the generated Swagger documentation files, providing a user-friendly interface for exploring API endpoints and their functionalities.
@@ -101,6 +121,8 @@ POSTGRES_PASSWORD=password
 POSTGRES_DB=bookstore
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
+REDIS_ADDR=localhost:6379
+SECRET_KEY=mock_secret_key
 ```
 
 ### 3. Run Docker Compose
