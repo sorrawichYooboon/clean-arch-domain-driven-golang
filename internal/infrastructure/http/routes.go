@@ -2,11 +2,11 @@ package http
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/controller"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/handler"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/middleware"
 )
 
-func SetupBookRoutes(e *echo.Echo, bookHandler *controller.BookHandler, secretKey string) {
+func SetupBookRoutes(e *echo.Echo, bookHandler *handler.BookHandler, secretKey string) {
 	bookGroup := e.Group("/books")
 	bookGroup.Use(middleware.AuthMiddleware(secretKey))
 
@@ -16,7 +16,7 @@ func SetupBookRoutes(e *echo.Echo, bookHandler *controller.BookHandler, secretKe
 	bookGroup.DELETE("/:id", bookHandler.Delete)
 }
 
-func SetupAuthorRoutes(e *echo.Echo, authorHandler *controller.AuthorHandler, secretKey string) {
+func SetupAuthorRoutes(e *echo.Echo, authorHandler *handler.AuthorHandler, secretKey string) {
 	authorGroup := e.Group("/authors")
 	authorGroup.Use(middleware.AuthMiddleware(secretKey))
 
@@ -26,7 +26,7 @@ func SetupAuthorRoutes(e *echo.Echo, authorHandler *controller.AuthorHandler, se
 	authorGroup.DELETE("/:id", authorHandler.Delete)
 }
 
-func SetupUserRoutes(e *echo.Echo, userHandler *controller.UserHandler) {
+func SetupUserRoutes(e *echo.Echo, userHandler *handler.UserHandler) {
 	e.POST("/register", userHandler.Register)
 	e.POST("/login", userHandler.Login)
 }

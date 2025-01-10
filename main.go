@@ -10,7 +10,7 @@ import (
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/cache"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/database"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/controller"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/handler"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -47,16 +47,16 @@ func main() {
 	bookRepo := database.NewBookRepository(cfg.DB)
 	cacheBookRepo := cache.NewCacheBookRepository(cfg.Redis)
 	bookUseCase := usecase.NewBookUseCase(bookRepo, *cacheBookRepo)
-	bookHandler := controller.NewBookHandler(bookUseCase)
+	bookHandler := handler.NewBookHandler(bookUseCase)
 
 	authorRepo := database.NewAuthorRepository(cfg.DB)
 	cacheAuthorRepo := cache.NewCacheAuthorRepository(cfg.Redis)
 	authorUseCase := usecase.NewAuthorUseCase(authorRepo, *cacheAuthorRepo)
-	authorHandler := controller.NewAuthorHandler(authorUseCase)
+	authorHandler := handler.NewAuthorHandler(authorUseCase)
 
 	userRepo := database.NewUserRepository(cfg.DB)
 	userUseCase := usecase.NewUserUseCase(userRepo)
-	userHandler := controller.NewUserHandler(userUseCase, cfg.SecretKey)
+	userHandler := handler.NewUserHandler(userUseCase, cfg.SecretKey)
 
 	http.SetupUserRoutes(e, userHandler)
 	http.SetupBookRoutes(e, bookHandler, cfg.SecretKey)

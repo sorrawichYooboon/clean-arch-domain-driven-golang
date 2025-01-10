@@ -47,8 +47,8 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 │   │   ├── /cache                   # Redis cache implementations
 │   │   │   ├── cache_book_repository.go   # Redis book cache repository
 │   │   │   └── cache_author_repository.go # Redis author cache repository
-│   │   ├── /http                    # HTTP controllers
-│   │   │   ├── /controller             # HTTP controllers
+│   │   ├── /http                    # HTTP handlers
+│   │   │   ├── /handler             # HTTP handlers
 │   │   │   │   ├── book_handler.go         # Book HTTP handler
 │   │   │   │   ├── author_handler.go       # Author HTTP handler
 │   │   │   │   └── user_handler.go         # User HTTP handler
@@ -80,7 +80,7 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
   - **infrastructure/**: Contains adapters for various infrastructures:
     - **database/**: Implements PostgreSQL-specific repository logic.
     - **cache/**: Implements Redis caching for optimized data retrieval.
-    - **http/**: Manages HTTP routing and controllers, handling incoming requests and responses.
+    - **http/**: Manages HTTP routing and handlers, handling incoming requests and responses.
     - **middleware/**: Implements middleware components, such as authentication middleware, for handling requests, enhancing the application’s security and logging capabilities.
     - **external/**: Contains integrations with external services, such as Shopify and Firebase, including service logic and repository interfaces for these services.
 - **migrations/**: Contains SQL scripts for creating the required database tables, which are automatically executed by the PostgreSQL Docker container during initialization. This ensures the database is set up correctly for application use.
@@ -168,6 +168,30 @@ http://localhost:8080/swagger/index.html
 ```
 
 This will provide an interactive interface for testing the API endpoints.
+
+## How to Test the API
+
+### 1. Register a New User
+
+Use the Register API to create a new user. You don’t need to fill in your own username and password. an example request body is already provided in Swagger.
+
+### 2. Login to Obtain a Token
+
+Use the Login API to authenticate the newly registered user and retrieve an access token. The example data from the registration step can be reused for login.
+
+### 3. Attach the Token in Swagger
+
+In the Swagger UI, click the Authorize button at the top of the page. Enter the token in the following format:
+
+```bash
+Bearer <token>
+```
+
+Click Authorize to apply the token for authenticated API requests.
+
+### 4. Test the Endpoints
+
+You can now test the various endpoints available in the Swagger UI. For example, you can create, read, update, and delete books and authors.
 
 ## Conclusion
 
