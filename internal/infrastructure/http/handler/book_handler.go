@@ -7,16 +7,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
 )
 
 type BookHandler struct {
-	UseCase *usecase.BookUseCase
+	bookUsecase usecaseinterface.BookUseCase
 }
 
-func NewBookHandler(uc *usecase.BookUseCase) *BookHandler {
+func NewBookHandler(bookUsecase usecaseinterface.BookUseCase) *BookHandler {
 	return &BookHandler{
-		UseCase: uc,
+		bookUsecase: bookUsecase,
 	}
 }
 
@@ -30,7 +30,7 @@ func NewBookHandler(uc *usecase.BookUseCase) *BookHandler {
 // @Failure 500 {object} map[string]string
 // @Router /books [get]
 func (h *BookHandler) GetAll(c echo.Context) error {
-	books, err := h.UseCase.GetAllBooks()
+	books, err := h.bookUsecase.GetAllBooks()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -55,7 +55,7 @@ func (h *BookHandler) Create(c echo.Context) error {
 		return err
 	}
 
-	err := h.UseCase.CreateBook(bookDTO.Title, bookDTO.Author, bookDTO.Category, bookDTO.PublishedYear)
+	err := h.bookUsecase.CreateBook(bookDTO.Title, bookDTO.Author, bookDTO.Category, bookDTO.PublishedYear)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -78,7 +78,7 @@ func (h *BookHandler) Create(c echo.Context) error {
 // @Router /books/{id} [put]
 func (h *BookHandler) Update(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	book, err := h.UseCase.GetBookByID(uint(id))
+	book, err := h.bookUsecase.GetBookByID(uint(id))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Book not found"})
 	}
@@ -96,7 +96,7 @@ func (h *BookHandler) Update(c echo.Context) error {
 		Category:      bookDTO.Category,
 	}
 
-	h.UseCase.UpdateBook(book)
+	h.bookUsecase.UpdateBook(book)
 	return c.JSON(http.StatusOK, book)
 }
 
@@ -111,7 +111,7 @@ func (h *BookHandler) Update(c echo.Context) error {
 // @Router /books/{id} [delete]
 func (h *BookHandler) Delete(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	if err := h.UseCase.DeleteBook(uint(id)); err != nil {
+	if err := h.bookUsecase.DeleteBook(uint(id)); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 

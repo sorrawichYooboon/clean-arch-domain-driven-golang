@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type UserRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepositoryImpl {
+func NewUserRepository(db *gorm.DB) repository.UserRepository {
 	return &UserRepositoryImpl{db: db}
 }
 

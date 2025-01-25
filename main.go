@@ -46,12 +46,12 @@ func main() {
 
 	bookRepo := database.NewBookRepository(cfg.DB)
 	cacheBookRepo := cache.NewCacheBookRepository(cfg.Redis)
-	bookUseCase := usecase.NewBookUseCase(bookRepo, *cacheBookRepo)
+	bookUseCase := usecase.NewBookUseCase(bookRepo, cacheBookRepo)
 	bookHandler := handler.NewBookHandler(bookUseCase)
 
 	authorRepo := database.NewAuthorRepository(cfg.DB)
 	cacheAuthorRepo := cache.NewCacheAuthorRepository(cfg.Redis)
-	authorUseCase := usecase.NewAuthorUseCase(authorRepo, *cacheAuthorRepo)
+	authorUseCase := usecase.NewAuthorUseCase(authorRepo, cacheAuthorRepo)
 	authorHandler := handler.NewAuthorHandler(authorUseCase)
 
 	userRepo := database.NewUserRepository(cfg.DB)

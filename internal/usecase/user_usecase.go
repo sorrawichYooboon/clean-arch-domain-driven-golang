@@ -5,18 +5,19 @@ import (
 
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
+	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserUseCase struct {
+type UserUseCaseImpl struct {
 	userRepo repository.UserRepository
 }
 
-func NewUserUseCase(userRepo repository.UserRepository) *UserUseCase {
-	return &UserUseCase{userRepo: userRepo}
+func NewUserUseCase(userRepo repository.UserRepository) usecaseinterface.UserUseCase {
+	return &UserUseCaseImpl{userRepo: userRepo}
 }
 
-func (uc *UserUseCase) CreateUser(username, password string) error {
+func (uc *UserUseCaseImpl) CreateUser(username, password string) error {
 	existingUser, _ := uc.userRepo.FindByUsername(username)
 	if existingUser != nil {
 		return errors.New("username already registered")
@@ -31,7 +32,7 @@ func (uc *UserUseCase) CreateUser(username, password string) error {
 	return uc.userRepo.Create(user)
 }
 
-func (uc *UserUseCase) Authenticate(username, password string) (*domain.User, error) {
+func (uc *UserUseCaseImpl) Authenticate(username, password string) (*domain.User, error) {
 	user, err := uc.userRepo.FindByUsername(username)
 	if err != nil {
 		return nil, err

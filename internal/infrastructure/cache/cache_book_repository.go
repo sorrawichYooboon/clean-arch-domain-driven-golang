@@ -6,17 +6,18 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 )
 
-type CacheBookRepository struct {
+type CacheBookRepositoryImpl struct {
 	Redis *redis.Client
 }
 
-func NewCacheBookRepository(redisClient *redis.Client) *CacheBookRepository {
-	return &CacheBookRepository{Redis: redisClient}
+func NewCacheBookRepository(redisClient *redis.Client) repository.CacheBookRepository {
+	return &CacheBookRepositoryImpl{Redis: redisClient}
 }
 
-func (r *CacheBookRepository) GetAll() ([]domain.Book, error) {
+func (r *CacheBookRepositoryImpl) GetAll() ([]domain.Book, error) {
 	ctx := context.Background()
 	booksJSON, err := r.Redis.Get(ctx, "books").Result()
 	if err == redis.Nil {
@@ -33,7 +34,7 @@ func (r *CacheBookRepository) GetAll() ([]domain.Book, error) {
 	return books, nil
 }
 
-func (r *CacheBookRepository) SetAll(books []domain.Book) error {
+func (r *CacheBookRepositoryImpl) SetAll(books []domain.Book) error {
 	ctx := context.Background()
 	booksJSON, err := json.Marshal(books)
 	if err != nil {

@@ -7,16 +7,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
 )
 
 type AuthorHandler struct {
-	UseCase *usecase.AuthorUseCase
+	authorUsecase usecaseinterface.AuthorUseCase
 }
 
-func NewAuthorHandler(uc *usecase.AuthorUseCase) *AuthorHandler {
+func NewAuthorHandler(authorUsecase usecaseinterface.AuthorUseCase) *AuthorHandler {
 	return &AuthorHandler{
-		UseCase: uc,
+		authorUsecase: authorUsecase,
 	}
 }
 
@@ -30,7 +30,7 @@ func NewAuthorHandler(uc *usecase.AuthorUseCase) *AuthorHandler {
 // @Failure 500 {object} map[string]string
 // @Router /authors [get]
 func (h *AuthorHandler) GetAll(c echo.Context) error {
-	authors, err := h.UseCase.GetAllAuthors()
+	authors, err := h.authorUsecase.GetAllAuthors()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -55,7 +55,7 @@ func (h *AuthorHandler) Create(c echo.Context) error {
 		return err
 	}
 
-	err := h.UseCase.CreateAuthor(authorDTO.Name, authorDTO.Bio)
+	err := h.authorUsecase.CreateAuthor(authorDTO.Name, authorDTO.Bio)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -78,7 +78,7 @@ func (h *AuthorHandler) Create(c echo.Context) error {
 // @Router /authors/{id} [put]
 func (h *AuthorHandler) Update(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	author, err := h.UseCase.GetAuthorByID(uint(id))
+	author, err := h.authorUsecase.GetAuthorByID(uint(id))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Author not found"})
 	}
@@ -94,7 +94,7 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 		Bio:  authorDTO.Bio,
 	}
 
-	h.UseCase.UpdateAuthor(author)
+	h.authorUsecase.UpdateAuthor(author)
 	return c.JSON(http.StatusOK, author)
 }
 
@@ -109,7 +109,7 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 // @Router /authors/{id} [delete]
 func (h *AuthorHandler) Delete(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	if err := h.UseCase.DeleteAuthor(uint(id)); err != nil {
+	if err := h.authorUsecase.DeleteAuthor(uint(id)); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 

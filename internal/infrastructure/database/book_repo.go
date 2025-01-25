@@ -2,26 +2,27 @@ package database
 
 import (
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 	"gorm.io/gorm"
 )
 
-type BookRepository struct {
+type BookRepositoryImpl struct {
 	DB *gorm.DB
 }
 
-func NewBookRepository(db *gorm.DB) *BookRepository {
-	return &BookRepository{
+func NewBookRepository(db *gorm.DB) repository.BookRepository {
+	return &BookRepositoryImpl{
 		DB: db,
 	}
 }
 
-func (r *BookRepository) GetAll() ([]domain.Book, error) {
+func (r *BookRepositoryImpl) GetAll() ([]domain.Book, error) {
 	var books []domain.Book
 	err := r.DB.Find(&books).Error
 	return books, err
 }
 
-func (r *BookRepository) GetByID(id uint) (*domain.Book, error) {
+func (r *BookRepositoryImpl) GetByID(id uint) (*domain.Book, error) {
 	var book domain.Book
 	err := r.DB.First(&book, id).Error
 	if err != nil {
@@ -30,14 +31,14 @@ func (r *BookRepository) GetByID(id uint) (*domain.Book, error) {
 	return &book, nil
 }
 
-func (r *BookRepository) Create(book *domain.Book) error {
+func (r *BookRepositoryImpl) Create(book *domain.Book) error {
 	return r.DB.Create(book).Error
 }
 
-func (r *BookRepository) Update(book *domain.Book) error {
+func (r *BookRepositoryImpl) Update(book *domain.Book) error {
 	return r.DB.Save(book).Error
 }
 
-func (r *BookRepository) Delete(id uint) error {
+func (r *BookRepositoryImpl) Delete(id uint) error {
 	return r.DB.Delete(&domain.Book{}, id).Error
 }

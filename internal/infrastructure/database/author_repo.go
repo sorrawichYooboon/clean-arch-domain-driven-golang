@@ -2,26 +2,27 @@ package database
 
 import (
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 	"gorm.io/gorm"
 )
 
-type AuthorRepository struct {
+type AuthorRepositoryImpl struct {
 	DB *gorm.DB
 }
 
-func NewAuthorRepository(db *gorm.DB) *AuthorRepository {
-	return &AuthorRepository{
+func NewAuthorRepository(db *gorm.DB) repository.AuthorRepository {
+	return &AuthorRepositoryImpl{
 		DB: db,
 	}
 }
 
-func (r *AuthorRepository) GetAll() ([]domain.Author, error) {
+func (r *AuthorRepositoryImpl) GetAll() ([]domain.Author, error) {
 	var authors []domain.Author
 	err := r.DB.Find(&authors).Error
 	return authors, err
 }
 
-func (r *AuthorRepository) GetByID(id uint) (*domain.Author, error) {
+func (r *AuthorRepositoryImpl) GetByID(id uint) (*domain.Author, error) {
 	var author domain.Author
 	err := r.DB.First(&author, id).Error
 	if err != nil {
@@ -30,14 +31,14 @@ func (r *AuthorRepository) GetByID(id uint) (*domain.Author, error) {
 	return &author, nil
 }
 
-func (r *AuthorRepository) Create(author *domain.Author) error {
+func (r *AuthorRepositoryImpl) Create(author *domain.Author) error {
 	return r.DB.Create(author).Error
 }
 
-func (r *AuthorRepository) Update(author *domain.Author) error {
+func (r *AuthorRepositoryImpl) Update(author *domain.Author) error {
 	return r.DB.Save(author).Error
 }
 
-func (r *AuthorRepository) Delete(id uint) error {
+func (r *AuthorRepositoryImpl) Delete(id uint) error {
 	return r.DB.Delete(&domain.Author{}, id).Error
 }

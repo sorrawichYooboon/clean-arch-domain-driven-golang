@@ -4,19 +4,18 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
+	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
 )
 
 type UserHandler struct {
-	userUseCase *usecase.UserUseCase
+	userUseCase usecaseinterface.UserUseCase
 	secretKey   string
 }
 
-func NewUserHandler(userUseCase *usecase.UserUseCase, secretKey string) *UserHandler {
+func NewUserHandler(userUseCase usecaseinterface.UserUseCase, secretKey string) *UserHandler {
 	return &UserHandler{userUseCase: userUseCase, secretKey: secretKey}
 }
 
