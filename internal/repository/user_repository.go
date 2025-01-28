@@ -1,8 +1,18 @@
 package repository
 
-import "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+import (
+	"time"
+)
+
+type User struct {
+	ID        string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Username  string    `gorm:"type:varchar(255);not null;unique" json:"username"`
+	Password  string    `gorm:"type:varchar(255);not null" json:"password"`
+	CreatedAt time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:timestamp;default:CURRENT_TIMESTAMP" json:"updated_at"`
+}
 
 type UserRepository interface {
-	Create(user *domain.User) error
-	FindByUsername(username string) (*domain.User, error)
+	Create(user *User) error
+	FindByUsername(username string) (*User, error)
 }

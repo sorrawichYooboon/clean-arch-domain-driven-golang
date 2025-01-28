@@ -21,9 +21,16 @@ func NewBookUseCase(bookRepo repository.BookRepository, cacheRepo repository.Cac
 }
 
 func (uc *BookUseCaseImpl) GetAllBooks() ([]domain.Book, error) {
+	resp := []domain.Book{}
 	books, err := uc.cacheRepo.GetAll()
-	if err == nil && books != nil {
-		return books, nil
+	if err != nil {
+		return nil, err
+	}
+
+	if len(books) > 0 {
+		for _, book := range books {
+			resp = append(resp, mapToDomainBook(book))
+		}
 	}
 
 	books, err = uc.bookRepo.GetAll()
@@ -35,23 +42,44 @@ func (uc *BookUseCaseImpl) GetAllBooks() ([]domain.Book, error) {
 		return nil, err
 	}
 
-	return books, nil
+	for _, book := range books {
+		resp = append(resp, mapToDomainBook(book))
+	}
+
+	return resp, nil
 }
 
 func (uc *BookUseCaseImpl) GetBookByID(id uint) (*domain.Book, error) {
-	return uc.bookRepo.GetByID(id)
+	book, err := uc.bookRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := mapToDomainBook(*book)
+
+	return &resp, nil
 }
 
 func (uc *BookUseCaseImpl) CreateBook(title, author, category string, publishedYear int) error {
 	book := domain.NewBook(title, author, category, publishedYear)
-	err := uc.bookRepo.Create(book)
+
+	createBookReq := &repository.Book{
+		Title:         book.Title,
+		Author:        book.Author,
+		Category:      book.Category,
+		PublishedYear: book.PublishedYear,
+	}
+
+	err := uc.bookRepo.Create(createBookReq)
 	if err != nil {
 		return err
 	}
 
 	books, cacheErr := uc.cacheRepo.GetAll()
 	if cacheErr == nil {
-		books = append(books, *book)
+		cacheBook := mapToRepoBook(*book)
+
+		books = append(books, cacheBook)
 		if cacheErr := uc.cacheRepo.SetAll(books); cacheErr != nil {
 			fmt.Println("Failed to update cache:", cacheErr)
 		}
@@ -60,7 +88,14 @@ func (uc *BookUseCaseImpl) CreateBook(title, author, category string, publishedY
 }
 
 func (uc *BookUseCaseImpl) UpdateBook(book *domain.Book) error {
-	err := uc.bookRepo.Update(book)
+	updateBookReq := &repository.Book{
+		ID:            book.ID,
+		Title:         book.Title,
+		Category:      book.Category,
+		PublishedYear: book.PublishedYear,
+	}
+
+	err := uc.bookRepo.Update(updateBookReq)
 	if err != nil {
 		return err
 	}
@@ -69,7 +104,9 @@ func (uc *BookUseCaseImpl) UpdateBook(book *domain.Book) error {
 	if cacheErr == nil {
 		for i, b := range books {
 			if b.ID == book.ID {
-				books[i] = *book
+				cacheBook := mapToRepoBook(*book)
+
+				books[i] = cacheBook
 				break
 			}
 		}
@@ -99,4 +136,24 @@ func (uc *BookUseCaseImpl) DeleteBook(id uint) error {
 		}
 	}
 	return nil
+}
+
+func mapToDomainBook(repoBook repository.Book) domain.Book {
+	return domain.Book{
+		ID:            repoBook.ID,
+		Title:         repoBook.Title,
+		Author:        repoBook.Author,
+		PublishedYear: repoBook.PublishedYear,
+		Category:      repoBook.Category,
+	}
+}
+
+func mapToRepoBook(domainBook domain.Book) repository.Book {
+	return repository.Book{
+		ID:            domainBook.ID,
+		Title:         domainBook.Title,
+		Author:        domainBook.Author,
+		PublishedYear: domainBook.PublishedYear,
+		Category:      domainBook.Category,
+	}
 }

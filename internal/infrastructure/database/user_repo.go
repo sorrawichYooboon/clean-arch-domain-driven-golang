@@ -1,7 +1,6 @@
 package database
 
 import (
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 	"gorm.io/gorm"
 )
@@ -14,12 +13,12 @@ func NewUserRepository(db *gorm.DB) repository.UserRepository {
 	return &UserRepositoryImpl{db: db}
 }
 
-func (r *UserRepositoryImpl) Create(user *domain.User) error {
+func (r *UserRepositoryImpl) Create(user *repository.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *UserRepositoryImpl) FindByUsername(username string) (*domain.User, error) {
-	var user domain.User
+func (r *UserRepositoryImpl) FindByUsername(username string) (*repository.User, error) {
+	var user repository.User
 	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}

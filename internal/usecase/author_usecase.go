@@ -21,9 +21,17 @@ func NewAuthorUseCase(authorRepo repository.AuthorRepository, cacheRepo reposito
 }
 
 func (uc *AuthorUseCaseImpl) GetAllAuthors() ([]domain.Author, error) {
+	resp := []domain.Author{}
 	authors, err := uc.cacheRepo.GetAll()
-	if err == nil && authors != nil {
-		return authors, nil
+	if err != nil {
+		return nil, err
+	}
+
+	if len(authors) > 0 {
+		for _, author := range authors {
+			resp = append(resp, mapToDomainAuthor(author))
+		}
+		return resp, nil
 	}
 
 	authors, err = uc.authorRepo.GetAll()
@@ -32,26 +40,45 @@ func (uc *AuthorUseCaseImpl) GetAllAuthors() ([]domain.Author, error) {
 	}
 
 	if err := uc.cacheRepo.SetAll(authors); err != nil {
-		fmt.Println("Failed to update cache:", err)
+		return nil, err
 	}
 
-	return authors, nil
+	for _, author := range authors {
+		resp = append(resp, mapToDomainAuthor(author))
+	}
+
+	return resp, nil
 }
 
 func (uc *AuthorUseCaseImpl) GetAuthorByID(id uint) (*domain.Author, error) {
-	return uc.authorRepo.GetByID(id)
+	author, err := uc.authorRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := mapToDomainAuthor(*author)
+
+	return &resp, nil
 }
 
 func (uc *AuthorUseCaseImpl) CreateAuthor(name, bio string) error {
 	author := domain.NewAuthor(name, bio)
-	err := uc.authorRepo.Create(author)
+
+	createAuthorReq := &repository.Author{
+		Name: author.Name,
+		Bio:  author.Bio,
+	}
+
+	err := uc.authorRepo.Create(createAuthorReq)
 	if err != nil {
 		return err
 	}
 
 	authors, cacheErr := uc.cacheRepo.GetAll()
 	if cacheErr == nil {
-		authors = append(authors, *author)
+		cacheAuthor := mapToRepoAuthor(*author)
+
+		authors = append(authors, cacheAuthor)
 		if cacheErr := uc.cacheRepo.SetAll(authors); cacheErr != nil {
 			fmt.Println("Failed to update cache:", cacheErr)
 		}
@@ -60,7 +87,13 @@ func (uc *AuthorUseCaseImpl) CreateAuthor(name, bio string) error {
 }
 
 func (uc *AuthorUseCaseImpl) UpdateAuthor(author *domain.Author) error {
-	err := uc.authorRepo.Update(author)
+	updateAuthorReq := &repository.Author{
+		ID:   author.ID,
+		Name: author.Name,
+		Bio:  author.Bio,
+	}
+
+	err := uc.authorRepo.Update(updateAuthorReq)
 	if err != nil {
 		return err
 	}
@@ -69,7 +102,9 @@ func (uc *AuthorUseCaseImpl) UpdateAuthor(author *domain.Author) error {
 	if cacheErr == nil {
 		for i, a := range authors {
 			if a.ID == author.ID {
-				authors[i] = *author
+				cacheAuthor := mapToRepoAuthor(*author)
+
+				authors[i] = cacheAuthor
 				break
 			}
 		}
@@ -99,4 +134,20 @@ func (uc *AuthorUseCaseImpl) DeleteAuthor(id uint) error {
 		}
 	}
 	return nil
+}
+
+func mapToDomainAuthor(repoAuthor repository.Author) domain.Author {
+	return domain.Author{
+		ID:   repoAuthor.ID,
+		Name: repoAuthor.Name,
+		Bio:  repoAuthor.Bio,
+	}
+}
+
+func mapToRepoAuthor(domainAuthor domain.Author) repository.Author {
+	return repository.Author{
+		ID:   domainAuthor.ID,
+		Name: domainAuthor.Name,
+		Bio:  domainAuthor.Bio,
+	}
 }

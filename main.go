@@ -12,6 +12,7 @@ import (
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/http/handler"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/migrations"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
@@ -43,6 +44,11 @@ func main() {
 	e := echo.New()
 
 	cfg := config.Initialize()
+
+	err := migrations.MigrateTables(cfg.DB)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
 
 	bookRepo := database.NewBookRepository(cfg.DB)
 	cacheBookRepo := cache.NewCacheBookRepository(cfg.Redis)
