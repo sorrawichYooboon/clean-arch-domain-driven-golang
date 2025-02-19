@@ -5,7 +5,7 @@ import (
 
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
-	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/pkg/apperror"
 )
 
 type AuthorUseCaseImpl struct {
@@ -13,7 +13,7 @@ type AuthorUseCaseImpl struct {
 	cacheRepo  repository.CacheAuthorRepository
 }
 
-func NewAuthorUseCase(authorRepo repository.AuthorRepository, cacheRepo repository.CacheAuthorRepository) usecaseinterface.AuthorUseCase {
+func NewAuthorUseCase(authorRepo repository.AuthorRepository, cacheRepo repository.CacheAuthorRepository) AuthorUseCase {
 	return &AuthorUseCaseImpl{
 		authorRepo: authorRepo,
 		cacheRepo:  cacheRepo,
@@ -24,7 +24,7 @@ func (uc *AuthorUseCaseImpl) GetAllAuthors() ([]domain.Author, error) {
 	resp := []domain.Author{}
 	authors, err := uc.cacheRepo.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, &apperror.ErrCacheDatabase
 	}
 
 	if len(authors) > 0 {
@@ -36,11 +36,11 @@ func (uc *AuthorUseCaseImpl) GetAllAuthors() ([]domain.Author, error) {
 
 	authors, err = uc.authorRepo.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, &apperror.ErrDatabase
 	}
 
 	if err := uc.cacheRepo.SetAll(authors); err != nil {
-		return nil, err
+		return nil, &apperror.ErrCacheDatabase
 	}
 
 	for _, author := range authors {
@@ -53,7 +53,7 @@ func (uc *AuthorUseCaseImpl) GetAllAuthors() ([]domain.Author, error) {
 func (uc *AuthorUseCaseImpl) GetAuthorByID(id uint) (*domain.Author, error) {
 	author, err := uc.authorRepo.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, &apperror.ErrDatabase
 	}
 
 	resp := mapToDomainAuthor(*author)
@@ -71,7 +71,7 @@ func (uc *AuthorUseCaseImpl) CreateAuthor(name, bio string) error {
 
 	err := uc.authorRepo.Create(createAuthorReq)
 	if err != nil {
-		return err
+		return &apperror.ErrDatabase
 	}
 
 	authors, cacheErr := uc.cacheRepo.GetAll()
@@ -95,7 +95,7 @@ func (uc *AuthorUseCaseImpl) UpdateAuthor(author *domain.Author) error {
 
 	err := uc.authorRepo.Update(updateAuthorReq)
 	if err != nil {
-		return err
+		return &apperror.ErrDatabase
 	}
 
 	authors, cacheErr := uc.cacheRepo.GetAll()
@@ -118,7 +118,7 @@ func (uc *AuthorUseCaseImpl) UpdateAuthor(author *domain.Author) error {
 func (uc *AuthorUseCaseImpl) DeleteAuthor(id uint) error {
 	err := uc.authorRepo.Delete(id)
 	if err != nil {
-		return err
+		return &apperror.ErrDatabase
 	}
 
 	authors, cacheErr := uc.cacheRepo.GetAll()

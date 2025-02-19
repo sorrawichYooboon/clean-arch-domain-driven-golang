@@ -7,15 +7,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
-	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/pkg/response"
 )
 
-type AuthorHandler struct {
-	authorUsecase usecaseinterface.AuthorUseCase
+type AuthorHandlerImpl struct {
+	authorUsecase usecase.AuthorUseCase
 }
 
-func NewAuthorHandler(authorUsecase usecaseinterface.AuthorUseCase) *AuthorHandler {
-	return &AuthorHandler{
+func NewAuthorHandler(authorUsecase usecase.AuthorUseCase) AuthorHandler {
+	return &AuthorHandlerImpl{
 		authorUsecase: authorUsecase,
 	}
 }
@@ -26,16 +27,25 @@ func NewAuthorHandler(authorUsecase usecaseinterface.AuthorUseCase) *AuthorHandl
 // @Tags authors
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} domain.Author
-// @Failure 500 {object} map[string]string
+// @Success 200 {object} response.APIResponse{data=[]dto.GetAllAuthorResponse}
+// @Failure 500 {object} response.APIResponse
 // @Router /authors [get]
-func (h *AuthorHandler) GetAll(c echo.Context) error {
+func (h *AuthorHandlerImpl) GetAll(c echo.Context) error {
 	authors, err := h.authorUsecase.GetAllAuthors()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, authors)
+	authorsResp := []dto.GetAllAuthorResponse{}
+	for _, author := range authors {
+		authorsResp = append(authorsResp, dto.GetAllAuthorResponse{
+			ID:   author.ID,
+			Name: author.Name,
+			Bio:  author.Bio,
+		})
+	}
+
+	return response.Success(c, http.StatusOK, response.SuccessGetAllAuthor, authorsResp)
 }
 
 // Create godoc
@@ -45,22 +55,23 @@ func (h *AuthorHandler) GetAll(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param author body dto.AuthorDTO true "Author data"
-// @Success 200 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Param author body dto.CreateAuthorRequest true "Author data"
+// @Success 200 {object} response.APIResponse
+// @Failure 400 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /authors [post]
-func (h *AuthorHandler) Create(c echo.Context) error {
-	authorDTO := new(dto.AuthorDTO)
-	if err := c.Bind(&authorDTO); err != nil {
-		return err
+func (h *AuthorHandlerImpl) Create(c echo.Context) error {
+	var req dto.CreateAuthorRequest
+	if err := c.Bind(&req); err != nil {
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
-	err := h.authorUsecase.CreateAuthor(authorDTO.Name, authorDTO.Bio)
+	err := h.authorUsecase.CreateAuthor(req.Name, req.Bio)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"status": "create author successfully"})
+	return response.Success(c, http.StatusOK, response.SuccessCreateAuthor, nil)
 }
 
 // Update godoc
@@ -71,31 +82,42 @@ func (h *AuthorHandler) Create(c echo.Context) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Author ID"
-// @Param author body dto.AuthorDTO true "Author data"
-// @Success 200 {object} domain.Author
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Param author body dto.UpdateAuthorRequest true "Updated Author data"
+// @Success 200 {object} response.APIResponse{data=dto.UpdateAuthorResponse}
+// @Failure 400 {object} response.APIResponse
+// @Failure 404 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /authors/{id} [put]
-func (h *AuthorHandler) Update(c echo.Context) error {
+func (h *AuthorHandlerImpl) Update(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	author, err := h.authorUsecase.GetAuthorByID(uint(id))
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Author not found"})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	authorDTO := new(dto.AuthorDTO)
-	if err := c.Bind(&authorDTO); err != nil {
-		return err
+	var req dto.UpdateAuthorRequest
+	if err := c.Bind(&req); err != nil {
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
 	author = &domain.Author{
 		ID:   author.ID,
-		Name: authorDTO.Name,
-		Bio:  authorDTO.Bio,
+		Name: req.Name,
+		Bio:  req.Bio,
 	}
 
-	h.authorUsecase.UpdateAuthor(author)
-	return c.JSON(http.StatusOK, author)
+	err = h.authorUsecase.UpdateAuthor(author)
+	if err != nil {
+		return response.Error(c, http.StatusInternalServerError, err)
+	}
+
+	authorResp := dto.UpdateAuthorResponse{
+		ID:   author.ID,
+		Name: author.Name,
+		Bio:  author.Bio,
+	}
+
+	return response.Success(c, http.StatusOK, response.SuccessUpdateAuthor, authorResp)
 }
 
 // Delete godoc
@@ -104,14 +126,14 @@ func (h *AuthorHandler) Update(c echo.Context) error {
 // @Tags authors
 // @Security ApiKeyAuth
 // @Param id path int true "Author ID"
-// @Success 204 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Success 204 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /authors/{id} [delete]
-func (h *AuthorHandler) Delete(c echo.Context) error {
+func (h *AuthorHandlerImpl) Delete(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.authorUsecase.DeleteAuthor(uint(id)); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"status": "delete author successfully"})
+	return response.Success(c, http.StatusOK, response.SuccessDeleteAuthor, nil)
 }

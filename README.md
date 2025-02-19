@@ -66,6 +66,14 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 │   │       └── config.go               # Environment variables or configuration logic
 ├── /migrations                  # Database migration scripts
 ├── /scripts                     # Utility scripts for database, development or deployment
+├── /pkg                         # Shared packages or utilities (e.g., error handling, logging)
+│   ├── /apperror
+│   │   └── usecase_errors.go    # Use case error handling
+│   ├── /httperror               # HTTP error handling
+│   │   └── http_errors.go       # HTTP error handling
+│   └── /response                # Response utilities
+│       ├── constants.go         # Constants for response messages
+│       └── response.go          # Response utilities
 └── go.mod                       # Go module file
 └── main.go                      # Entry point for the app
 ```
@@ -86,6 +94,8 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 - **migrations/**: Contains SQL scripts for creating the required database tables, which are automatically executed by the PostgreSQL Docker container during initialization. This ensures the database is set up correctly for application use.
 
 - **docs/**: Holds the generated Swagger documentation files, providing a user-friendly interface for exploring API endpoints and their functionalities.
+
+- **pkg/**: Contains shared packages and utilities that can be used across the application. This includes error handling, logging, and response utilities to ensure consistent behavior and responses throughout the application.
 
 ### Key Features
 

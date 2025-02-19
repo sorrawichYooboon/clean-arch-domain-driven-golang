@@ -6,7 +6,7 @@ import (
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/infrastructure/middleware"
 )
 
-func SetupBookRoutes(e *echo.Echo, bookHandler *handler.BookHandler, secretKey string) {
+func SetupBookRoutes(e *echo.Echo, bookHandler handler.BookHandler, secretKey string) {
 	bookGroup := e.Group("/books")
 	bookGroup.Use(middleware.AuthMiddleware(secretKey))
 
@@ -16,7 +16,7 @@ func SetupBookRoutes(e *echo.Echo, bookHandler *handler.BookHandler, secretKey s
 	bookGroup.DELETE("/:id", bookHandler.Delete)
 }
 
-func SetupAuthorRoutes(e *echo.Echo, authorHandler *handler.AuthorHandler, secretKey string) {
+func SetupAuthorRoutes(e *echo.Echo, authorHandler handler.AuthorHandler, secretKey string) {
 	authorGroup := e.Group("/authors")
 	authorGroup.Use(middleware.AuthMiddleware(secretKey))
 
@@ -26,7 +26,7 @@ func SetupAuthorRoutes(e *echo.Echo, authorHandler *handler.AuthorHandler, secre
 	authorGroup.DELETE("/:id", authorHandler.Delete)
 }
 
-func SetupUserRoutes(e *echo.Echo, userHandler *handler.UserHandler) {
+func SetupUserRoutes(e *echo.Echo, userHandler handler.UserHandler) {
 	e.POST("/register", userHandler.Register)
 	e.POST("/login", userHandler.Login)
 }

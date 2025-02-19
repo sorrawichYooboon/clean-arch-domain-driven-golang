@@ -7,60 +7,64 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
-	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/pkg/response"
 )
 
-type UserHandler struct {
-	userUseCase usecaseinterface.UserUseCase
+type UserHandlerImpl struct {
+	userUseCase usecase.UserUseCase
 	secretKey   string
 }
 
-func NewUserHandler(userUseCase usecaseinterface.UserUseCase, secretKey string) *UserHandler {
-	return &UserHandler{userUseCase: userUseCase, secretKey: secretKey}
+func NewUserHandler(userUseCase usecase.UserUseCase, secretKey string) UserHandler {
+	return &UserHandlerImpl{userUseCase: userUseCase, secretKey: secretKey}
 }
 
 // Register godoc
 // @Summary Register a new user
-// @Description Register a new user
+// @Description Register a new user in the system
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param user body dto.CredentialsDTO true "User information"
-// @Success 201 {object} dto.ResponseDTO "User registered successfully"
-// @Failure 400 {object} dto.ErrorDTO "Invalid input"
+// @Param user body dto.UserRegisterRequest true "User registration data"
+// @Success 201 {object} response.APIResponse
+// @Failure 400 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /register [post]
-func (h *UserHandler) Register(c echo.Context) error {
-	var credentials dto.CredentialsDTO
-	if err := c.Bind(&credentials); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
+func (h *UserHandlerImpl) Register(c echo.Context) error {
+	var req dto.UserRegisterRequest
+	if err := c.Bind(&req); err != nil {
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
-	if err := h.userUseCase.CreateUser(credentials.Username, credentials.Password); err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to create user"})
+	if err := h.userUseCase.CreateUser(req.Username, req.Password); err != nil {
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusCreated, dto.ResponseDTO{Message: "User created successfully"})
+	return response.Success(c, http.StatusOK, response.SuccessRegisterUser, nil)
 }
 
 // Login godoc
-// @Summary Login user
-// @Description Login user and return JWT token
+// @Summary Authenticate user
+// @Description Authenticate the user and return a JWT token
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param credentials body dto.CredentialsDTO true "User login credentials"
-// @Success 200 {object} dto.TokenResponseDTO "JWT token"
-// @Failure 401 {object} dto.ErrorDTO "Unauthorized"
+// @Param credentials body dto.UserLoginRequest true "User login credentials"
+// @Success 200 {object} response.APIResponse{data=dto.UserLoginResponse}
+// @Failure 400 {object} response.APIResponse
+// @Failure 401 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /login [post]
-func (h *UserHandler) Login(c echo.Context) error {
-	var credentials dto.CredentialsDTO
-	if err := c.Bind(&credentials); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid input"})
+func (h *UserHandlerImpl) Login(c echo.Context) error {
+	var req dto.UserLoginRequest
+	if err := c.Bind(&req); err != nil {
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
-	authUser, err := h.userUseCase.Authenticate(credentials.Username, credentials.Password)
+	authUser, err := h.userUseCase.Authenticate(req.Username, req.Password)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "Invalid credentials"})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
 	// Generate JWT token
@@ -72,8 +76,8 @@ func (h *UserHandler) Login(c echo.Context) error {
 
 	tokenString, err := token.SignedString([]byte(h.secretKey))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to generate token"})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, dto.TokenResponseDTO{Token: tokenString})
+	return response.Success(c, http.StatusOK, response.SuccessLoginUser, dto.UserLoginResponse{Token: tokenString})
 }

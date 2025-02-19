@@ -7,15 +7,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/dto"
-	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/pkg/response"
 )
 
-type BookHandler struct {
-	bookUsecase usecaseinterface.BookUseCase
+type BookHandlerImpl struct {
+	bookUsecase usecase.BookUseCase
 }
 
-func NewBookHandler(bookUsecase usecaseinterface.BookUseCase) *BookHandler {
-	return &BookHandler{
+func NewBookHandler(bookUsecase usecase.BookUseCase) BookHandler {
+	return &BookHandlerImpl{
 		bookUsecase: bookUsecase,
 	}
 }
@@ -26,16 +27,27 @@ func NewBookHandler(bookUsecase usecaseinterface.BookUseCase) *BookHandler {
 // @Tags books
 // @Produce json
 // @Security ApiKeyAuth
-// @Success 200 {array} domain.Book
-// @Failure 500 {object} map[string]string
+// @Success 200 {object} response.APIResponse{data=[]dto.GetAllBookResponse}
+// @Failure 500 {object} response.APIResponse
 // @Router /books [get]
-func (h *BookHandler) GetAll(c echo.Context) error {
+func (h *BookHandlerImpl) GetAll(c echo.Context) error {
 	books, err := h.bookUsecase.GetAllBooks()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, books)
+	booksResp := []dto.GetAllBookResponse{}
+	for _, book := range books {
+		booksResp = append(booksResp, dto.GetAllBookResponse{
+			ID:            book.ID,
+			Title:         book.Title,
+			Author:        book.Author,
+			PublishedYear: book.PublishedYear,
+			Category:      book.Category,
+		})
+	}
+
+	return response.Success(c, http.StatusOK, response.SuccessGetAllBook, booksResp)
 }
 
 // Create godoc
@@ -45,22 +57,23 @@ func (h *BookHandler) GetAll(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param book body dto.BookDTO true "Book data"
-// @Success 200 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Param book body dto.CreateBookRequest true "Book data"
+// @Success 200 {object} response.APIResponse
+// @Failure 400 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /books [post]
-func (h *BookHandler) Create(c echo.Context) error {
-	bookDTO := new(dto.BookDTO)
-	if err := c.Bind(bookDTO); err != nil {
-		return err
+func (h *BookHandlerImpl) Create(c echo.Context) error {
+	var req dto.CreateBookRequest
+	if err := c.Bind(req); err != nil {
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
-	err := h.bookUsecase.CreateBook(bookDTO.Title, bookDTO.Author, bookDTO.Category, bookDTO.PublishedYear)
+	err := h.bookUsecase.CreateBook(req.Title, req.Author, req.Category, req.PublishedYear)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"status": "create book successfully"})
+	return response.Success(c, http.StatusOK, response.SuccessCreateBook, nil)
 }
 
 // Update godoc
@@ -71,33 +84,38 @@ func (h *BookHandler) Create(c echo.Context) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param id path int true "Book ID"
-// @Param book body dto.BookDTO true "Book data"
-// @Success 200 {object} domain.Book
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Param book body dto.UpdateBookRequest true "Updated Book data"
+// @Success 200 {object} response.APIResponse{data=dto.UpdateBookResponse}
+// @Failure 400 {object} response.APIResponse
+// @Failure 404 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /books/{id} [put]
-func (h *BookHandler) Update(c echo.Context) error {
+func (h *BookHandlerImpl) Update(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	book, err := h.bookUsecase.GetBookByID(uint(id))
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Book not found"})
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
-	bookDTO := new(dto.BookDTO)
-	if err := c.Bind(&bookDTO); err != nil {
-		return err
+	var req dto.UpdateBookRequest
+	if err := c.Bind(&req); err != nil {
+		return response.Error(c, http.StatusBadRequest, err)
 	}
 
 	book = &domain.Book{
 		ID:            book.ID,
-		Title:         bookDTO.Title,
-		Author:        bookDTO.Author,
-		PublishedYear: bookDTO.PublishedYear,
-		Category:      bookDTO.Category,
+		Title:         req.Title,
+		Author:        req.Author,
+		PublishedYear: req.PublishedYear,
+		Category:      req.Category,
 	}
 
-	h.bookUsecase.UpdateBook(book)
-	return c.JSON(http.StatusOK, book)
+	err = h.bookUsecase.UpdateBook(book)
+	if err != nil {
+		return response.Error(c, http.StatusInternalServerError, err)
+	}
+
+	return response.Success(c, http.StatusOK, response.SuccessUpdateBook, nil)
 }
 
 // Delete godoc
@@ -106,14 +124,14 @@ func (h *BookHandler) Update(c echo.Context) error {
 // @Tags books
 // @Security ApiKeyAuth
 // @Param id path int true "Book ID"
-// @Success 204 {object} map[string]string
-// @Failure 500 {object} map[string]string
+// @Success 200 {object} response.APIResponse
+// @Failure 500 {object} response.APIResponse
 // @Router /books/{id} [delete]
-func (h *BookHandler) Delete(c echo.Context) error {
+func (h *BookHandlerImpl) Delete(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 	if err := h.bookUsecase.DeleteBook(uint(id)); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return response.Error(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"status": "delete book successfully"})
+	return response.Success(c, http.StatusOK, response.SuccessDeleteBook, nil)
 }

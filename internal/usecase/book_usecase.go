@@ -5,7 +5,7 @@ import (
 
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
-	usecaseinterface "github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase/interface"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/pkg/apperror"
 )
 
 type BookUseCaseImpl struct {
@@ -13,7 +13,7 @@ type BookUseCaseImpl struct {
 	cacheRepo repository.CacheBookRepository
 }
 
-func NewBookUseCase(bookRepo repository.BookRepository, cacheRepo repository.CacheBookRepository) usecaseinterface.BookUseCase {
+func NewBookUseCase(bookRepo repository.BookRepository, cacheRepo repository.CacheBookRepository) BookUseCase {
 	return &BookUseCaseImpl{
 		bookRepo:  bookRepo,
 		cacheRepo: cacheRepo,
@@ -24,7 +24,7 @@ func (uc *BookUseCaseImpl) GetAllBooks() ([]domain.Book, error) {
 	resp := []domain.Book{}
 	books, err := uc.cacheRepo.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, &apperror.ErrCacheDatabase
 	}
 
 	if len(books) > 0 {
@@ -35,11 +35,11 @@ func (uc *BookUseCaseImpl) GetAllBooks() ([]domain.Book, error) {
 
 	books, err = uc.bookRepo.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, &apperror.ErrDatabase
 	}
 
 	if err := uc.cacheRepo.SetAll(books); err != nil {
-		return nil, err
+		return nil, &apperror.ErrCacheDatabase
 	}
 
 	for _, book := range books {
@@ -52,7 +52,7 @@ func (uc *BookUseCaseImpl) GetAllBooks() ([]domain.Book, error) {
 func (uc *BookUseCaseImpl) GetBookByID(id uint) (*domain.Book, error) {
 	book, err := uc.bookRepo.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, &apperror.ErrDatabase
 	}
 
 	resp := mapToDomainBook(*book)
@@ -72,7 +72,7 @@ func (uc *BookUseCaseImpl) CreateBook(title, author, category string, publishedY
 
 	err := uc.bookRepo.Create(createBookReq)
 	if err != nil {
-		return err
+		return &apperror.ErrDatabase
 	}
 
 	books, cacheErr := uc.cacheRepo.GetAll()
@@ -97,7 +97,7 @@ func (uc *BookUseCaseImpl) UpdateBook(book *domain.Book) error {
 
 	err := uc.bookRepo.Update(updateBookReq)
 	if err != nil {
-		return err
+		return &apperror.ErrDatabase
 	}
 
 	books, cacheErr := uc.cacheRepo.GetAll()
@@ -120,7 +120,7 @@ func (uc *BookUseCaseImpl) UpdateBook(book *domain.Book) error {
 func (uc *BookUseCaseImpl) DeleteBook(id uint) error {
 	err := uc.bookRepo.Delete(id)
 	if err != nil {
-		return err
+		return &apperror.ErrDatabase
 	}
 
 	books, cacheErr := uc.cacheRepo.GetAll()
