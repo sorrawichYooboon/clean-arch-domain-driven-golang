@@ -5,18 +5,19 @@ import (
 	"encoding/json"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
+	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/usecase"
 )
 
 type CacheAuthorRepositoryImpl struct {
 	Redis *redis.Client
 }
 
-func NewCacheAuthorRepository(redisClient *redis.Client) repository.CacheAuthorRepository {
+func NewCacheAuthorRepository(redisClient *redis.Client) usecase.CacheAuthorRepository {
 	return &CacheAuthorRepositoryImpl{Redis: redisClient}
 }
 
-func (r *CacheAuthorRepositoryImpl) GetAll() ([]repository.Author, error) {
+func (r *CacheAuthorRepositoryImpl) GetAll() ([]domain.Author, error) {
 	ctx := context.Background()
 	authorsJSON, err := r.Redis.Get(ctx, "authors").Result()
 	if err == redis.Nil {
@@ -25,7 +26,7 @@ func (r *CacheAuthorRepositoryImpl) GetAll() ([]repository.Author, error) {
 		return nil, err
 	}
 
-	var authors []repository.Author
+	var authors []domain.Author
 	if err := json.Unmarshal([]byte(authorsJSON), &authors); err != nil {
 		return nil, err
 	}
@@ -33,7 +34,7 @@ func (r *CacheAuthorRepositoryImpl) GetAll() ([]repository.Author, error) {
 	return authors, nil
 }
 
-func (r *CacheAuthorRepositoryImpl) SetAll(authors []repository.Author) error {
+func (r *CacheAuthorRepositoryImpl) SetAll(authors []domain.Author) error {
 	ctx := context.Background()
 	authorsJSON, err := json.Marshal(authors)
 	if err != nil {

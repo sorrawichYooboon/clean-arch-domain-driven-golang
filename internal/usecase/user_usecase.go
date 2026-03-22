@@ -1,18 +1,16 @@
 package usecase
 
 import (
-	"github.com/google/uuid"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/domain"
-	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/internal/repository"
 	"github.com/sorrawichYooboon/clean-arch-domain-driven-golang/pkg/apperror"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserUseCaseImpl struct {
-	userRepo repository.UserRepository
+	userRepo UserRepository
 }
 
-func NewUserUseCase(userRepo repository.UserRepository) UserUseCase {
+func NewUserUseCase(userRepo UserRepository) UserUseCase {
 	return &UserUseCaseImpl{userRepo: userRepo}
 }
 
@@ -28,10 +26,7 @@ func (uc *UserUseCaseImpl) CreateUser(username, password string) error {
 	}
 
 	user := domain.NewUser(username, string(hashedPassword))
-
-	createUserReq := mapToRepoUser(*user)
-
-	err = uc.userRepo.Create(&createUserReq)
+	err = uc.userRepo.Create(user)
 	if err != nil {
 		return &apperror.ErrDatabase
 	}
@@ -48,24 +43,5 @@ func (uc *UserUseCaseImpl) Authenticate(username, password string) (*domain.User
 		return nil, &apperror.ErrInvalidCredentials
 	}
 
-	resp := mapToDomainUser(*user)
-
-	return &resp, nil
-}
-
-func mapToDomainUser(repoUser repository.User) domain.User {
-	id, _ := uuid.Parse(repoUser.ID)
-	return domain.User{
-		ID:       id,
-		Username: repoUser.Username,
-		Password: repoUser.Password,
-	}
-}
-
-func mapToRepoUser(domainUser domain.User) repository.User {
-	return repository.User{
-		ID:       domainUser.ID.String(),
-		Username: domainUser.Username,
-		Password: domainUser.Password,
-	}
+	return user, nil
 }

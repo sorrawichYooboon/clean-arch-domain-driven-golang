@@ -22,3 +22,34 @@ type UserUseCase interface {
 	CreateUser(username, password string) error
 	Authenticate(username, password string) (*domain.User, error)
 }
+
+type BookRepository interface {
+	GetAll() ([]domain.Book, error)
+	GetByID(id uint) (*domain.Book, error)
+	Create(book *domain.Book) error
+	Update(book *domain.Book) error
+	Delete(id uint) error
+}
+
+type CacheBookRepository interface {
+	GetAll() ([]domain.Book, error)
+	SetAll(books []domain.Book) error
+}
+
+type AuthorRepository interface {
+	GetAll() ([]domain.Author, error)
+	GetByID(id uint) (*domain.Author, error)
+	Create(author *domain.Author) error
+	Update(author *domain.Author) error
+	Delete(id uint) error
+}
+
+type CacheAuthorRepository interface {
+	GetAll() ([]domain.Author, error)
+	SetAll(authors []domain.Author) error
+}
+
+type UserRepository interface {
+	Create(user *domain.User) error
+	FindByUsername(username string) (*domain.User, error)
+}
