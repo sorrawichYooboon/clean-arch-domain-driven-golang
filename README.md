@@ -27,18 +27,11 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 │   │   ├── credentials_dto.go              # DTO for user credentials (login/register)
 │   │   ├── error_dto.go                    # Error responses for API
 │   │   └── response_dto.go                 # Generic response structure for API
-│   ├── /usecase                     # Use case logic
-│   │   ├── /interface                  # Interfaces for use cases
-│   │   │   ├── author_usecase_interface.go   # Author use case interface
-│   │   │   ├── book_usecase_interface.go     # Book use case interface
-│   │   │   └── user_usecase_interface.go     # User use case interface
+│   ├── /usecase                     # Use case logic & Repository Interfaces (Ports)
+│   │   ├── interface.go                # Defines Usecase and Repository contracts
 │   │   ├── book_usecase.go             # Book-related use cases
 │   │   ├── author_usecase.go           # Author-related use cases
 │   │   └── user_usecase.go             # User-related use cases
-│   ├── /repository                  # Repository interfaces
-│   │   ├── book_repository.go          # Book repository interface
-│   │   ├── author_repository.go        # Author repository interface
-│   │   └── user_repository.go          # User repository interface
 │   ├── /infrastructure              # Infrastructure (adapters)
 │   │   ├── /database                   # Database (Postgres) implementation
 │   │   │   ├── book_repo.go                # Postgres book repository
@@ -83,8 +76,7 @@ _Image Source: [Bitloops Documentation](https://bitloops.com/docs/bitloops-langu
 - **internal/**: This directory contains the core application logic, structured as follows:
   - **domain/**: Core domain entities, including definitions for the `Book` and `Author` entities.
   - **dto/**: Contains Data Transfer Objects (DTOs) for API requests and responses, including the author, book, user credentials, and error responses. This layer ensures data is transferred efficiently between the client and server.
-  - **usecase/**: This folder implements the use case logic for the application, encapsulating the business rules and application services related to books and authors.
-  - **repository/**: Defines repository interfaces that outline how data will be accessed. This layer abstracts the underlying data source, allowing for easy swapping between different implementations.
+  - **usecase/**: This folder implements the use case logic for the application, encapsulating the business rules. It also defines the Repository Interfaces (Ports) to enforce strict dependency boundaries without database logic leaking inward.
   - **infrastructure/**: Contains adapters for various infrastructures:
     - **database/**: Implements PostgreSQL-specific repository logic.
     - **cache/**: Implements Redis caching for optimized data retrieval.
